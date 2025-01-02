@@ -1,12 +1,16 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 5f; // Velocidad del personaje
-    public bool canMove = true; // Control de movimiento
+    public float moveSpeed = 5f;             // Velocidad del personaje
+    public GameObject arrowPrefab;          // Prefab de la flecha
+    public Transform bowPivot;              // Empty GameObject como pivote para el arco
+    public Animator bowAnimator;            // Animator del arco
 
-    private Animator anim;
     private Vector2 moveInput;
+    private Animator anim;
+    private bool invert = false;
 
     void Start()
     {
@@ -15,9 +19,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (!canMove) return;
-
-        // Movimiento en X e Y usando W, A, S, D
+        // Movimiento del jugador
         float moveX = 0f;
         float moveY = 0f;
 
@@ -26,22 +28,23 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.A)) moveX = -1f;    // Izquierda
         if (Input.GetKey(KeyCode.D)) moveX = 1f;     // Derecha
 
-        // Normaliza el movimiento para evitar velocidad más rápida en diagonal
         moveInput = new Vector2(moveX, moveY).normalized;
 
-        // Mueve al personaje
+        // Mover al jugador
         transform.position += (Vector3)moveInput * moveSpeed * Time.deltaTime;
 
-        // Actualiza animaciones
+        // Actualizar la dirección del arco (según la posición del ratón)
+        UpdateBowDirection();
+
+        // Actualizar las animaciones
         UpdateAnimations(moveX, moveY);
 
-        // Ataques
-        if (Input.GetButtonDown("Fire1"))
+        // Disparar la flecha al hacer clic
+        if (Input.GetMouseButtonDown(0)) // Botón izquierdo
         {
-            Attack(moveX, moveY);
+            FireArrow();
         }
     }
-
 
     void UpdateAnimations(float moveX, float moveY)
     {
@@ -49,47 +52,62 @@ public class PlayerController : MonoBehaviour
         bool isRunning = moveInput.magnitude > 0;
         anim.SetBool("isRunning", isRunning);
 
-        // Invertir sprite si se mueve a la izquierda
+        // Invertir la escala del personaje (NO del arco)
         if (moveX > 0)
-            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-        else if (moveX < 0)
-            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-    }
-
-
-    void Attack(float moveX, float moveY)
-    {
-        canMove = false; // Bloquea el movimiento mientras ataca
-        anim.SetBool("isAttacking", true);
-
-        // Determina la dirección del ataque
-        if (moveX > 0)
-            anim.SetFloat("attackDirection", 0); // Derecha
-        else if (moveX < 0)
-            anim.SetFloat("attackDirection", 1); // Izquierda
-        else if (moveY > 0)
-            anim.SetFloat("attackDirection", 2); // Adelante
-        else if (moveY < 0)
-            anim.SetFloat("attackDirection", 3); // Atrás
-        else
-            anim.SetFloat("attackDirection", 2); // Por defecto adelante
-
-        // Regresa al movimiento después de 0.1 segundos
-        Invoke("ResetAttack", 0.1f);
-    }
-
-    void ResetAttack()
-    {
-        canMove = true;
-        anim.SetBool("isAttacking", false);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        // Detecta colisiones con objetos o enemigos
-        if (collision.CompareTag("Enemy"))
         {
-            Debug.Log("Colisión con enemigo");
+            invert = false;
+            transform.localScale = new Vector3(3, 3, 1); // Mover a la derecha
+        }
+        else if (moveX < 0)
+        {
+            invert = true;
+            transform.localScale = new Vector3(-3, 3, 1); // Mover a la izquierda
+        }
+    }
+
+    void UpdateBowDirection()
+    {
+        // Obtener la posición del ratón en el mundo
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = 0; // Asegurarse de que la rotación no se vea afectada por el eje Z
+
+        // Dirección hacia el ratón
+        Vector2 direction = (mousePosition - bowPivot.position).normalized;
+
+        if (invert)
+        {
+            direction = -direction;
+        }
+
+        // Calcular el ángulo de rotación necesario para mirar hacia el ratón
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        // Rotar el pivote del arco, pero sin invertir el arco
+        bowPivot.rotation = Quaternion.Euler(0, 0, angle);
+    }
+
+    void FireArrow()
+    {
+        // Activar la animación del arco al disparar
+        if (bowAnimator != null)
+        {
+            bowAnimator.SetTrigger("Shoot");
+        }
+
+        // Crear la flecha
+        GameObject arrow = Instantiate(arrowPrefab, bowPivot.position, bowPivot.rotation);
+
+        // Configurar la dirección de la flecha
+        ArrowController arrowController = arrow.GetComponent<ArrowController>();
+        if (arrowController != null)
+        {
+            // La flecha se moverá en la dirección en la que apunta el arco
+            Vector3 direction = bowPivot.right;
+            if (invert)
+            {
+                direction = -direction;
+            }
+            arrowController.ConfigurarDireccion(direction);
         }
     }
 }
