@@ -12,8 +12,8 @@ TagManager:
   - Water
   - UI
   - Ground
-  - 
-  - 
+  - Projectile
+  - Structure
   - 
   - 
   - 
@@ -46,4 +46,7 @@ TagManager:
     locked: 0
   - name: Personajes
     uniqueID: 3019688473
+    locked: 0
+  - name: Structure
+    uniqueID: 1088271879
     locked: 0

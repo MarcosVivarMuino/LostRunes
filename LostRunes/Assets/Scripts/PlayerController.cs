@@ -1,25 +1,51 @@
 using UnityEngine;
-using UnityEngine.UIElements;
+
+using UnityEngine;
+
+using UnityEngine;
+
+using UnityEngine;
+
+using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 5f;             // Velocidad del personaje
     public GameObject arrowPrefab;          // Prefab de la flecha
-    public Transform bowPivot;              // Empty GameObject como pivote para el arco
+    public Transform bowPivot;              // Pivote del arco
     public Animator bowAnimator;            // Animator del arco
+    public ArrowPool arrowPool;             // Pool de flechas
 
-    private Vector2 moveInput;
-    private Animator anim;
-    private bool invert = false;
+    private Vector2 moveInput;              // Entrada de movimiento
+    private Animator anim;                  // Animator del jugador
+    private bool invert = false;            // Control para invertir el arco
+    private Rigidbody2D rb;                 // Referencia al Rigidbody2D
+    private ICommand fireCommand;           // Comando para disparar
 
     void Start()
     {
         anim = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>(); // Obtener el Rigidbody2D
     }
 
     void Update()
     {
-        // Movimiento del jugador
+        // Manejar movimiento
+        HandleMovement();
+
+        // Actualizar dirección del arco (ratón)
+        UpdateBowDirection();
+
+        // Disparar flecha al hacer clic
+        if (Input.GetMouseButtonDown(0)) // Botón izquierdo
+        {
+            FireArrow();
+        }
+    }
+
+    void HandleMovement()
+    {
+        // Entrada de movimiento
         float moveX = 0f;
         float moveY = 0f;
 
@@ -30,46 +56,45 @@ public class PlayerController : MonoBehaviour
 
         moveInput = new Vector2(moveX, moveY).normalized;
 
-        // Mover al jugador
-        transform.position += (Vector3)moveInput * moveSpeed * Time.deltaTime;
+        // Ejecutar el comando de movimiento
+        ICommand moveCommand = new MoveCommand(this, moveInput);
+        moveCommand.Execute();
 
-        // Actualizar la dirección del arco (según la posición del ratón)
-        UpdateBowDirection();
-
-        // Actualizar las animaciones
-        UpdateAnimations(moveX, moveY);
-
-        // Disparar la flecha al hacer clic
-        if (Input.GetMouseButtonDown(0)) // Botón izquierdo
-        {
-            FireArrow();
-        }
+        // Actualizar animaciones
+        UpdateAnimations(moveInput);
     }
 
-    void UpdateAnimations(float moveX, float moveY)
+    public void Move(Vector2 direction)
     {
-        // Animación de correr
-        bool isRunning = moveInput.magnitude > 0;
+        // Usar Rigidbody2D para moverse y manejar colisiones
+        Vector2 newPosition = rb.position + direction * moveSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(newPosition);
+    }
+
+    void UpdateAnimations(Vector2 movement)
+    {
+        // Establecer si el personaje está corriendo
+        bool isRunning = movement.magnitude > 0;
         anim.SetBool("isRunning", isRunning);
 
-        // Invertir la escala del personaje (NO del arco)
-        if (moveX > 0)
+        // Ajustar la dirección de la escala para girar el personaje
+        if (movement.x > 0)
         {
-            invert = false;
-            transform.localScale = new Vector3(3, 3, 1); // Mover a la derecha
+            invert = false; // Mirando hacia la derecha
+            transform.localScale = new Vector3(3, 3, 1);
         }
-        else if (moveX < 0)
+        else if (movement.x < 0)
         {
-            invert = true;
-            transform.localScale = new Vector3(-3, 3, 1); // Mover a la izquierda
+            invert = true; // Mirando hacia la izquierda
+            transform.localScale = new Vector3(-3, 3, 1);
         }
     }
 
     void UpdateBowDirection()
     {
-        // Obtener la posición del ratón en el mundo
+        // Obtener posición del ratón
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = 0; // Asegurarse de que la rotación no se vea afectada por el eje Z
+        mousePosition.z = 0; // Ignorar el eje Z
 
         // Dirección hacia el ratón
         Vector2 direction = (mousePosition - bowPivot.position).normalized;
@@ -79,35 +104,25 @@ public class PlayerController : MonoBehaviour
             direction = -direction;
         }
 
-        // Calcular el ángulo de rotación necesario para mirar hacia el ratón
+        // Calcular el ángulo de rotación necesario
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-        // Rotar el pivote del arco, pero sin invertir el arco
+        // Aplicar rotación al pivote del arco
         bowPivot.rotation = Quaternion.Euler(0, 0, angle);
     }
 
     void FireArrow()
     {
-        // Activar la animación del arco al disparar
-        if (bowAnimator != null)
+        // Obtener la dirección hacia el ratón
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 direction = bowPivot.right;
+        if (invert)
         {
-            bowAnimator.SetTrigger("Shoot");
+            direction = -direction;
         }
 
-        // Crear la flecha
-        GameObject arrow = Instantiate(arrowPrefab, bowPivot.position, bowPivot.rotation);
-
-        // Configurar la dirección de la flecha
-        ArrowController arrowController = arrow.GetComponent<ArrowController>();
-        if (arrowController != null)
-        {
-            // La flecha se moverá en la dirección en la que apunta el arco
-            Vector3 direction = bowPivot.right;
-            if (invert)
-            {
-                direction = -direction;
-            }
-            arrowController.ConfigurarDireccion(direction);
-        }
+        // Crear comando de disparo
+        fireCommand = new FireCommand(bowPivot, arrowPool, direction, bowAnimator);
+        fireCommand.Execute();
     }
 }
