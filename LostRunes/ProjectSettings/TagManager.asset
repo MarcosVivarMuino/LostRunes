@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Tower
   layers:
   - Default
   - TransparentFX
@@ -14,7 +15,7 @@ TagManager:
   - Ground
   - Projectile
   - Structure
-  - 
+  - Tower
   - 
   - 
   - 
@@ -49,4 +50,7 @@ TagManager:
     locked: 0
   - name: Structure
     uniqueID: 1088271879
+    locked: 0
+  - name: Enemies
+    uniqueID: 1684165755
     locked: 0
