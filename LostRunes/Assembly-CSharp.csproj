@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\Patrones\Prototype\Enemy.cs" />
     <Compile Include="Assets\Scripts\Patrones\ObjectPool\ArrowPool.cs" />
     <Compile Include="Assets\Scripts\Patrones\Command\FireCommand.cs" />
+    <Compile Include="Assets\Scripts\DynController.cs" />
     <Compile Include="Assets\Scripts\Patrones\Prototype\EnemySpawner.cs" />
     <Compile Include="Assets\Scripts\Patrones\Command\ICommand.cs" />
     <Compile Include="Assets\Scripts\Patrones\Prototype\RangedEnemy.cs" />
