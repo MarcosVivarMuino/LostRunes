@@ -17,7 +17,7 @@ public class RangedEnemy : Enemy
     private void Start()
     {
         anim = GetComponent<Animator>();
-        target = GameObject.FindGameObjectWithTag("Player").transform; // Buscar jugador por tag
+        target = GameObject.FindGameObjectWithTag("Tower").transform; // Buscar jugador por tag
     }
 
     private void Update()

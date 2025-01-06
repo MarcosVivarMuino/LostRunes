@@ -1,16 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DynController : MonoBehaviour
 {
-    public float speed = 10f;           // Velocidad del proyectil
-    public float damage = 10f;          // Daño del proyectil
-    public float lifeTime = 3f;         // Tiempo antes de desaparecer automáticamente
+    public float speed = 10f;               // Velocidad del proyectil
+    public float damage = 10f;              // Daño del proyectil
+    public float lifeTime = 3f;             // Tiempo antes de desaparecer automáticamente
 
-    private Vector3 direction;          // Dirección del proyectil
-    private Animator anim;              // Referencia al Animator
-    private bool hasHit = false;        // Control para evitar múltiples impactos
+    private Vector3 direction;              // Dirección del proyectil
+    private Animator anim;                  // Referencia al Animator
+    private bool hasHit = false;            // Control para evitar múltiples impactos
 
     void Start()
     {
@@ -24,7 +22,7 @@ public class DynController : MonoBehaviour
     {
         if (!hasHit)
         {
-            // Mover el proyectil continuamente
+            // Mover el proyectil continuamente hacia adelante
             transform.position += direction * speed * Time.deltaTime;
         }
     }
@@ -41,15 +39,21 @@ public class DynController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!hasHit)
+        // Verificar si colisiona con la torre
+        if (!hasHit && collision.CompareTag("Tower"))
         {
-            hasHit = true;
+            hasHit = true; // Marcar como impactado para evitar múltiples colisiones
 
-            // Si impacta, desactiva el movimiento
-            speed = 0;
+            // Hacer daño a la torre
+            Tower tower = collision.GetComponent<Tower>();
+            if (tower != null)
+            {
+                tower.TakeDamage(damage);
+            }
 
-            // Destruir el proyectil después del impacto (o devolverlo al pool si usas Object Pooling)
+            // Destruir después de un pequeño retraso para dar tiempo a la animación
             Destroy(gameObject, 0.2f);
         }
     }
 }
+
