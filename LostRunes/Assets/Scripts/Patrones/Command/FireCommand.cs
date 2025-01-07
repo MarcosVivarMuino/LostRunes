@@ -26,7 +26,7 @@ public class FireCommand : ICommand
         }
 
         // Obtener una flecha del pool
-        GameObject arrow = arrowPool.GetArrow();
+        GameObject arrow = arrowPool.Get();
 
         // Configurar posición y rotación de la flecha
         arrow.transform.position = bowPivot.position;

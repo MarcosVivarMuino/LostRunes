@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 3333960727052155779}
   m_Layer: 0
   m_Name: Ranged_Prefab
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -61,7 +61,7 @@ Transform:
   m_GameObject: {fileID: 6312978998595913056}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.669299, y: 0.014973283, z: 0}
+  m_LocalPosition: {x: -13.68, y: 0.75, z: 0}
   m_LocalScale: {x: 2.18, y: 2.18, z: 2.18}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -133,14 +133,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyName: Ranged
-  health: 30
+  maxHealth: 60
+  healthBarPrefab: {fileID: 1277316908961784128, guid: 74514f66cfbb4e1439cd59dd9b47498a, type: 3}
   damage: 15
   speed: 1
   attackRange: 8
   attackCooldown: 1.5
   projectilePrefab: {fileID: 8600240883495612903, guid: 11e8b94f6a3d06a4dbf26bfc1e2e2c11, type: 3}
   firePoint: {fileID: 6170487824176169956}
-  projectileSpeed: 10
+  projectileSpeed: 5
 --- !u!61 &4819451893732449226
 BoxCollider2D:
   m_ObjectHideFlags: 0

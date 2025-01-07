@@ -114,7 +114,6 @@ public class PlayerController : MonoBehaviour
     void FireArrow()
     {
         // Obtener la dirección hacia el ratón
-        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3 direction = bowPivot.right;
         if (invert)
         {

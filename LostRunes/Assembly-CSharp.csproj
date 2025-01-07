@@ -70,8 +70,10 @@
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\Patrones\Prototype\MeleeEnemy.cs" />
     <Compile Include="Assets\Scripts\Tower.cs" />
+    <Compile Include="Assets\Scripts\Patrones\ObjectPool\EnemyProjectilePool.cs" />
     <Compile Include="Assets\Scripts\Patrones\Command\MoveCommand.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
+    <Compile Include="Assets\Scripts\Patrones\ObjectPool\IObjectPool.cs" />
     <Compile Include="Assets\Scripts\ArrowController.cs" />
   </ItemGroup>
   <ItemGroup>

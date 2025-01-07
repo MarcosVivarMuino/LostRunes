@@ -3,56 +3,56 @@ using UnityEngine;
 public class RangedEnemy : Enemy
 {
     private Animator anim;                  // Animator para las animaciones
-    private Transform target;               // Objetivo (jugador)
+    private Transform target;               // Objetivo (torre)
     private bool isAttacking = false;       // Bandera para controlar el ataque
 
     public float attackRange = 8f;          // Rango de ataque
     public float attackCooldown = 1.5f;     // Tiempo entre disparos
     private float lastAttackTime = 0f;      // Registro del último disparo
 
-    public GameObject projectilePrefab;     // Prefab del proyectil
     public Transform firePoint;             // Punto desde donde dispara el proyectil
     public float projectileSpeed = 10f;     // Velocidad del proyectil
 
-    private void Start()
+    private EnemyProjectilePool projectilePool; // Referencia al pool de proyectiles enemigos
+
+    void Awake()
     {
         anim = GetComponent<Animator>();
-        target = GameObject.FindGameObjectWithTag("Tower").transform; // Buscar jugador por tag
+        target = GameObject.FindGameObjectWithTag("Tower").transform; // Buscar torre como objetivo
+
+        // Buscar el pool en la escena
+        projectilePool = FindObjectOfType<EnemyProjectilePool>();
+
+        if (projectilePool == null)
+        {
+            Debug.LogError("EnemyProjectilePool no encontrado en la escena.");
+        }
     }
 
-    private void Update()
+    void Update()
     {
-        // Si el enemigo está muerto, no hacer nada
-        if (health <= 0) return;
-
-        // Calcular distancia al jugador
+        // Calcular distancia al objetivo
         float distance = Vector3.Distance(transform.position, target.position);
 
         if (distance <= attackRange)
         {
-            // Si está en rango, atacar
+            // Atacar si está en rango
             Attack();
         }
         else
         {
-            // Si no está atacando, moverse hacia el jugador
+            // Moverse hacia el objetivo si no está atacando
             if (!isAttacking)
             {
-                Move(target.position);
+                Move(target.position); // Usa el método heredado de Enemy
                 anim.SetBool("isRunning", true); // Activar animación de correr
             }
         }
     }
 
-    public override void Move(Vector3 targetPosition)
-    {
-        // Mover hacia el objetivo
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-        FlipSprite(targetPosition); // Girar el sprite
-    }
-
     private void Attack()
     {
+        // Comprobar si puede atacar según el cooldown
         if (Time.time - lastAttackTime > attackCooldown)
         {
             // Detener el movimiento
@@ -62,8 +62,8 @@ public class RangedEnemy : Enemy
             anim.SetTrigger("Attack");
             isAttacking = true;
 
-            // Disparar el proyectil
-            Invoke(nameof(FireProjectile), 0.3f); // Retraso para sincronizar con la animación
+            // Disparar el proyectil después de sincronizar con la animación
+            Invoke(nameof(FireProjectile), 0.3f);
 
             // Reiniciar cooldown
             lastAttackTime = Time.time;
@@ -77,37 +77,35 @@ public class RangedEnemy : Enemy
     {
         if (target == null) return;
 
-        // Crear el proyectil
-        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+        // Obtener el proyectil del pool
+        GameObject projectile = projectilePool.Get();
 
-        // Calcular dirección hacia el jugador
+        // Desactivar el proyectil primero, antes de activarlo después de la configuración
+        projectile.SetActive(false);
+
+        // Configurar la posición inicial y la dirección del proyectil
+        projectile.transform.position = firePoint.position;
+        projectile.transform.rotation = Quaternion.identity;
+
+        // Calcular dirección hacia el objetivo
         Vector3 direction = (target.position - firePoint.position).normalized;
 
-        // Configurar el proyectil
-        Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
-        rb.velocity = direction * projectileSpeed;
-
-        // Girar el proyectil según la dirección
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        projectile.transform.rotation = Quaternion.Euler(0, 0, angle);
+        // Inicializar el controlador del proyectil
+        DynController dyn = projectile.GetComponent<DynController>();
+        if (dyn != null)
+        {
+            dyn.Initialize(direction, damage, projectilePool); // Configurar proyectil
+            projectile.SetActive(true); // Activar proyectil después de la configuración
+        }
+        else
+        {
+            Debug.LogError("El proyectil no tiene un DynController.");
+        }
     }
 
     private void ResetAttack()
     {
         isAttacking = false;
-    }
-
-    private void FlipSprite(Vector3 targetPosition)
-    {
-        // Girar el sprite según la posición del objetivo
-        if (targetPosition.x > transform.position.x)
-        {
-            transform.localScale = new Vector3(2.18f, 2.18f, 2.18f); // Mirando a la derecha
-        }
-        else
-        {
-            transform.localScale = new Vector3(-2.18f, 2.18f, 2.18f); // Mirando a la izquierda
-        }
     }
 
     public override Enemy Clone()

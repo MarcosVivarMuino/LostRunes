@@ -37,11 +37,10 @@ public class ArrowController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D colision)
     {
-        // Aquí puedes agregar lógica adicional, como detectar si colisiona con un enemigo
-        //if (colision.CompareTag("Enemy"))  // Ejemplo: detectar enemigos por tag
-        //{
-        //    colision.GetComponent<Enemy>().TakeDamage(dano); // Aplicar daño
-        //}
+        if (colision.CompareTag("Enemy"))
+        {
+            colision.GetComponent<Enemy>().TakeDamage(dano);
+        }
 
         // Retornar al pool tras cualquier colisión
         RetornarAlPool();
@@ -52,7 +51,7 @@ public class ArrowController : MonoBehaviour
         // Si tenemos un pool, devolvemos la flecha allí
         if (pool != null)
         {
-            pool.ReturnArrow(gameObject);
+            pool.Return(gameObject);
         }
         else
         {

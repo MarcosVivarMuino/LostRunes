@@ -1,59 +1,69 @@
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class DynController : MonoBehaviour
 {
-    public float speed = 10f;               // Velocidad del proyectil
-    public float damage = 10f;              // Daño del proyectil
-    public float lifeTime = 3f;             // Tiempo antes de desaparecer automáticamente
+    [SerializeField] private float velocidad = 10f;       // Velocidad del proyectil
+    [SerializeField] private float dano = 10f;            // Daño que hace el proyectil
+    [SerializeField] private float tiempoDeVida = 5f;     // Tiempo máximo antes de volver al pool
 
-    private Vector3 direction;              // Dirección del proyectil
-    private Animator anim;                  // Referencia al Animator
-    private bool hasHit = false;            // Control para evitar múltiples impactos
+    private Vector3 direccion;                            // Dirección del proyectil
+    private float tiempoTranscurrido = 0f;                // Tiempo en vuelo
+    private EnemyProjectilePool pool;                     // Referencia al pool de proyectiles enemigos
 
-    void Start()
+    // Inicializar el proyectil con dirección, objetivo y pool
+    public void Initialize(Vector3 nuevaDireccion, float dano, EnemyProjectilePool pool)
     {
-        anim = GetComponent<Animator>();
+        direccion = nuevaDireccion.normalized; // Normalizar dirección
+        this.dano = dano;                      // Asignar daño
+        this.pool = pool;                      // Asignar pool
+        tiempoTranscurrido = 0f;               // Reiniciar el tiempo de vida
 
-        // Destruir después de cierto tiempo
-        Destroy(gameObject, lifeTime);
+        // Desactivar el proyectil para asegurarse de que no se active antes de ser completamente inicializado
+        gameObject.SetActive(false);
     }
 
-    void Update()
+    private void OnEnable()
     {
-        if (!hasHit)
+        // Solo cuando el proyectil se habilita, empezar a moverse
+        tiempoTranscurrido = 0f; // Reiniciar el tiempo transcurrido cada vez que el proyectil es activado
+    }
+
+    private void Update()
+    {
+        // Mover el proyectil en la dirección establecida
+        transform.position += direccion * velocidad * Time.deltaTime;
+
+        // Devolver al pool si excede el tiempo de vida
+        tiempoTranscurrido += Time.deltaTime;
+        if (tiempoTranscurrido >= tiempoDeVida)
         {
-            // Mover el proyectil continuamente hacia adelante
-            transform.position += direction * speed * Time.deltaTime;
+            RetornarAlPool();
         }
     }
 
-    public void SetDirection(Vector3 newDirection)
+    private void OnTriggerEnter2D(Collider2D colision)
     {
-        // Configurar la dirección del proyectil
-        direction = newDirection.normalized;
+        if (colision.CompareTag("Tower"))
+        {
+            colision.GetComponent<Tower>().TakeDamage(dano);
+        }
 
-        // Ajustar la rotación hacia el objetivo
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        // Retornar al pool tras cualquier colisión
+        RetornarAlPool();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void RetornarAlPool()
     {
-        // Verificar si colisiona con la torre
-        if (!hasHit && collision.CompareTag("Tower"))
+        // Devolver al pool si está asignado
+        if (pool != null)
         {
-            hasHit = true; // Marcar como impactado para evitar múltiples colisiones
-
-            // Hacer daño a la torre
-            Tower tower = collision.GetComponent<Tower>();
-            if (tower != null)
-            {
-                tower.TakeDamage(damage);
-            }
-
-            // Destruir después de un pequeño retraso para dar tiempo a la animación
-            Destroy(gameObject, 0.2f);
+            pool.Return(gameObject);
+        }
+        else
+        {
+            // Si no hay pool, destruir el proyectil
+            Destroy(gameObject);
         }
     }
 }
-

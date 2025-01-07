@@ -4,90 +4,64 @@ using UnityEngine;
 
 public class MeleeEnemy : Enemy
 {
-    private Animator anim;             // Referencia al Animator
-    private Transform target;          // Objetivo del enemigo
-    private bool isAttacking = false;  // Bandera para controlar el ataque
+    private Transform target;         // Objetivo del enemigo (jugador o torre)
+    public float attackRange = 1.5f;  // Rango de ataque
+    public float attackCooldown = 1f; // Tiempo entre ataques
 
-    public float attackRange = 1.5f;   // Rango de ataque
-    public float attackCooldown = 1f;  // Tiempo entre ataques
-    private float lastAttackTime = 0f; // Registro del último ataque
+    private float lastAttackTime;     // Control del tiempo del último ataque
+    private Animator anim;            // Referencia al Animator
 
-    private void Start()
+    void Awake()
     {
-        anim = GetComponent<Animator>(); // Obtener el Animator
-        target = GameObject.FindGameObjectWithTag("Tower").transform; // Buscar al jugador por tag
+        anim = GetComponent<Animator>(); // Inicializar el Animator
+        target = GameObject.FindGameObjectWithTag("Tower").transform; // Buscar la torre como objetivo
     }
 
-    private void Update()
+    void Update()
     {
-        // Si el enemigo está muerto, no hacer nada
-        if (health <= 0) return;
-
-        // Calcular distancia al objetivo
-        float distance = Vector3.Distance(transform.position, target.position);
-
-        if (distance <= attackRange)
+        if (target != null)
         {
-            // Si está en rango de ataque
-            Attack();
-        }
-        else
-        {
-            // Mover hacia el objetivo si no está atacando
-            if (!isAttacking)
+            // Obtener la distancia al objetivo
+            float distanceToTarget = Vector3.Distance(transform.position, target.position);
+
+            if (distanceToTarget > attackRange)
             {
-                Move(target.position);
-                anim.SetBool("isRunning", true); // Animación de correr
+                // Movimiento hacia el objetivo
+                Move(target.position); // Usa el método heredado de Enemy
+                anim.SetBool("isRunning", true); // Activar animación de correr
+            }
+            else
+            {
+                anim.SetBool("isRunning", false); // Detener animación de correr
+
+                // Comprobar si puede atacar (cooldown)
+                if (Time.time >= lastAttackTime + attackCooldown)
+                {
+                    Attack(); // Realizar ataque
+                    lastAttackTime = Time.time; // Actualizar tiempo del último ataque
+                }
             }
         }
     }
 
-    public override void Move(Vector3 targetPosition)
-    {
-        // Mover hacia el jugador
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-        FlipSprite(targetPosition); // Girar el sprite si es necesario
-    }
-
+    // Método para atacar al objetivo
     private void Attack()
     {
-        if (Time.time - lastAttackTime > attackCooldown)
+        anim.SetTrigger("Attack"); // Activar la animación de ataque
+
+        // Verificar si el objetivo sigue en rango
+        float distanceToTarget = Vector3.Distance(transform.position, target.position);
+        if (distanceToTarget <= attackRange)
         {
-            // Detener el movimiento
-            anim.SetBool("isRunning", false);
-
-            // Lanzar animación de ataque
-            anim.SetTrigger("Attack");
-            isAttacking = true;
-
-            // Reiniciar cooldown
-            lastAttackTime = Time.time;
-
-            // Simular daño al jugador
-            target.GetComponent<Tower>().TakeDamage(damage);
-
-            // Reactivar movimiento después del ataque
-            Invoke(nameof(ResetAttack), 0.5f); // Esperar medio segundo
+            Tower tower = target.GetComponent<Tower>();
+            if (tower != null)
+            {
+                tower.TakeDamage(damage); // Infligir daño a la torre
+            }
         }
     }
 
-    private void ResetAttack()
-    {
-        isAttacking = false;
-    }
 
-    private void FlipSprite(Vector3 targetPosition)
-    {
-        // Girar el sprite según la posición del objetivo
-        if (targetPosition.x > transform.position.x)
-        {
-            transform.localScale = new Vector3(3.22f, 3.22f, 3.22f); // Derecha
-        }
-        else
-        {
-            transform.localScale = new Vector3(-3.22f, 3.22f, 3.22f); // Izquierda
-        }
-    }
 
     public override Enemy Clone()
     {

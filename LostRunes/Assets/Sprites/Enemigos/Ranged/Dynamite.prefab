@@ -100,9 +100,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 303f7d6b12ff7b74dabdc983ff7eeab7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
-  damage: 15
-  lifeTime: 4
+  velocidad: 5
+  dano: 10
+  tiempoDeVida: 15
 --- !u!50 &6698933434321080270
 Rigidbody2D:
   serializedVersion: 4
@@ -145,7 +145,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 136
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
