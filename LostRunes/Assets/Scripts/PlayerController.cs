@@ -11,7 +11,6 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 5f;             // Velocidad del personaje
-    public GameObject arrowPrefab;          // Prefab de la flecha
     public Transform bowPivot;              // Pivote del arco
     public Animator bowAnimator;            // Animator del arco
     public ArrowPool arrowPool;             // Pool de flechas

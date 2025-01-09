@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnemyProjectilePool : MonoBehaviour, IObjectPool<GameObject>
 {
     public GameObject projectilePrefab; // Prefab del proyectil enemigo
-    public int poolSize = 10;           // Tamaño inicial del pool
+    public int poolSize = 20;           // Tamaño inicial del pool
 
     private Queue<GameObject> projectilePool = new Queue<GameObject>();
 
@@ -35,9 +35,6 @@ public class EnemyProjectilePool : MonoBehaviour, IObjectPool<GameObject>
             // Si no hay proyectiles disponibles, crear uno nuevo
             projectile = Instantiate(projectilePrefab);
         }
-
-        // Asegurarse de que el proyectil esté en la posición correcta antes de activarlo
-        projectile.transform.position = Vector3.zero; // Coloca la posición deseada aquí
 
         projectile.SetActive(true); // Activar el proyectil después de colocarlo
         projectile.transform.SetParent(transform); // Liberar del pool al activarlo

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6170487824176169956}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 4819451893732449226}
   - component: {fileID: 3299418489407711817}
   - component: {fileID: 3333960727052155779}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Ranged_Prefab
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -139,9 +139,9 @@ MonoBehaviour:
   speed: 1
   attackRange: 8
   attackCooldown: 1.5
-  projectilePrefab: {fileID: 8600240883495612903, guid: 11e8b94f6a3d06a4dbf26bfc1e2e2c11, type: 3}
   firePoint: {fileID: 6170487824176169956}
   projectileSpeed: 5
+  projectilePool: {fileID: 0}
 --- !u!61 &4819451893732449226
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6698933434321080270}
   - component: {fileID: 8238745386329514706}
   - component: {fileID: 8888864174121087301}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Dynamite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.33, y: 0.045, z: 0}
-  m_LocalScale: {x: 2.4, y: 2.4, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -102,7 +102,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   velocidad: 5
   dano: 10
-  tiempoDeVida: 15
+  tiempoDeVida: 10
 --- !u!50 &6698933434321080270
 Rigidbody2D:
   serializedVersion: 4
@@ -142,10 +142,10 @@ BoxCollider2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 136
+    m_Bits: 1535
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2

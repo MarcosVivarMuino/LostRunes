@@ -13,14 +13,12 @@ public class RangedEnemy : Enemy
     public Transform firePoint;             // Punto desde donde dispara el proyectil
     public float projectileSpeed = 10f;     // Velocidad del proyectil
 
-    private EnemyProjectilePool projectilePool; // Referencia al pool de proyectiles enemigos
+    [SerializeField] private EnemyProjectilePool projectilePool; // Referencia al pool de proyectiles enemigos
 
     void Awake()
     {
         anim = GetComponent<Animator>();
         target = GameObject.FindGameObjectWithTag("Tower").transform; // Buscar torre como objetivo
-
-        // Buscar el pool en la escena
         projectilePool = FindObjectOfType<EnemyProjectilePool>();
 
         if (projectilePool == null)
@@ -80,12 +78,8 @@ public class RangedEnemy : Enemy
         // Obtener el proyectil del pool
         GameObject projectile = projectilePool.Get();
 
-        // Desactivar el proyectil primero, antes de activarlo después de la configuración
-        projectile.SetActive(false);
-
         // Configurar la posición inicial y la dirección del proyectil
         projectile.transform.position = firePoint.position;
-        projectile.transform.rotation = Quaternion.identity;
 
         // Calcular dirección hacia el objetivo
         Vector3 direction = (target.position - firePoint.position).normalized;
@@ -95,7 +89,6 @@ public class RangedEnemy : Enemy
         if (dyn != null)
         {
             dyn.Initialize(direction, damage, projectilePool); // Configurar proyectil
-            projectile.SetActive(true); // Activar proyectil después de la configuración
         }
         else
         {
