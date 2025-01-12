@@ -126,7 +126,7 @@ MonoBehaviour:
   healthBarPrefab: {fileID: 1277316908961784128, guid: 74514f66cfbb4e1439cd59dd9b47498a, type: 3}
   damage: 10
   speed: 2
-  attackRange: 2
+  attackRange: 2.4
   attackCooldown: 2
 --- !u!50 &7963087148500756904
 Rigidbody2D:
@@ -198,5 +198,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.37, y: 0.34}
+  m_Size: {x: 0.28, y: 0.25}
   m_EdgeRadius: 0

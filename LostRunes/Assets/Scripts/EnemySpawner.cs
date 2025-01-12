@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
@@ -51,7 +49,9 @@ public class EnemySpawner : MonoBehaviour
     private Vector3 GetRandomSpawnPoint(Vector3 center, float radius)
     {
         float angle = Random.Range(0f, Mathf.PI * 2);
-        float distance = Random.Range(0f, radius);
+
+        float distance = Random.Range(radius, radius * 1.1f);
+
         float x = center.x + Mathf.Cos(angle) * distance;
         float y = center.y + Mathf.Sin(angle) * distance;
         return new Vector3(x, y, center.z);

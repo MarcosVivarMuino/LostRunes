@@ -39,17 +39,9 @@ public class Tower : MonoBehaviour
     // Método para manejar la destrucción de la torre
     private void DestroyTower()
     {
-        Debug.Log("¡La torre ha sido destruida!");
-        // Aquí podrías añadir lógica adicional, como terminar el juego
-        Destroy(gameObject); // Destruir el objeto de la torre
-    }
 
-    // Método opcional para reparar la torre
-    public void Repair(float amount)
-    {
-        currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        UpdateHealthBar();
+        UIManager.Instance.GoToDefeat();
+        Destroy(gameObject); // Destruir el objeto de la torre
     }
 }
 

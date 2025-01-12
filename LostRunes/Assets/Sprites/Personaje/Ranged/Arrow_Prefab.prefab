@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocidad: 10
-  dano: 10
+  dano: 15
   tiempoDeVida: 2
 --- !u!50 &7164040118271674265
 Rigidbody2D:
