@@ -1,9 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-using System.Collections.Generic;
-using UnityEngine;
-
 public class EnemyPool : MonoBehaviour
 {
     [SerializeField] private GameObject[] enemyPrefabs; // Prefabs de enemigos
